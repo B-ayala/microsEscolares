@@ -29,17 +29,17 @@ export default function Students() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterPago, setFilterPago] = useState('all');
   const [filterTurno, setFilterTurno] = useState('all');
-  
+
   const students = useStudentStore((state) => state.students);
   const openModal = useModalStore((state) => state.openModal);
 
   const filteredStudents = useMemo(() => {
     return students.filter((student) => {
-      const matchSearch = 
+      const matchSearch =
         student.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
         student.apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
         student.dni.includes(searchTerm);
-      
+
       const matchPago = filterPago === 'all' || student.estadoPago === filterPago;
       const matchTurno = filterTurno === 'all' || student.turno.toLowerCase() === filterTurno.toLowerCase();
 
@@ -75,7 +75,7 @@ export default function Students() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <div className="flex w-full sm:w-auto gap-4">
+          <div className="grid grid-cols-2 sm:flex w-full sm:w-auto gap-4">
             <select
               value={filterTurno}
               onChange={(e) => setFilterTurno(e.target.value)}
@@ -101,7 +101,7 @@ export default function Students() {
           </div>
         </div>
 
-        <Table>
+        <Table className="min-w-full whitespace-nowrap text-sm sm:text-base">
           <TableHeader>
             <TableRow>
               <TableHead>Nombre y Apellido</TableHead>

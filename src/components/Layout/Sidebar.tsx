@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, School, Users, CreditCard, LogOut, Bus } from 'lucide-react';
+import { LayoutDashboard, School, Users, CreditCard, LogOut, Bus, X } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -10,14 +10,30 @@ const navigation = [
   { name: 'Pagos', href: '/payments', icon: CreditCard },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  className?: string;
+  onClose?: () => void;
+}
+
+export default function Sidebar({ className, onClose }: SidebarProps) {
   return (
-    <div className="flex flex-col w-64 bg-[linear-gradient(90deg,rgb(0,0,0)_0%,rgb(90,85,214)_100%)] border-r border-white/10 h-screen hidden md:flex shadow-xl">
-      <div className="flex items-center gap-3 h-16 px-6 border-b border-white/10">
-        <div className="bg-primary/20 p-2 rounded-lg">
-          <Bus className="w-5 h-5 text-violet-300" />
+    <div className={twMerge("flex flex-col w-64 bg-[linear-gradient(90deg,rgb(0,0,0)_0%,rgb(90,85,214)_100%)] border-r border-white/10 h-screen shadow-xl", className)}>
+      <div className="flex items-center justify-between h-16 px-6 border-b border-white/10">
+        <div className="flex items-center gap-3">
+          <div className="bg-primary/20 p-2 rounded-lg">
+            <Bus className="w-5 h-5 text-violet-300" />
+          </div>
+          <span className="font-bold text-lg text-white tracking-wide">TranspoSys</span>
         </div>
-        <span className="font-bold text-lg text-white tracking-wide">TranspoSys</span>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="md:hidden p-2 text-violet-300 hover:text-white focus:outline-none"
+            title="Cerrar menú"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       <div className="flex-1 py-6 overflow-y-auto">
@@ -26,6 +42,7 @@ export default function Sidebar() {
             <NavLink
               key={item.name}
               to={item.href}
+              onClick={onClose}
               className={({ isActive }) =>
                 twMerge(
                   clsx(
