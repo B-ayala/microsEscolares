@@ -296,7 +296,7 @@ export default function Students() {
           </button>
         </div>
 
-        <Table>
+        <Table className="min-w-full whitespace-nowrap text-sm sm:text-base">
           <TableHeader>
             <TableRow>
               <TableHead className="cursor-pointer select-none" onClick={() => handleSort('apellido')}>
