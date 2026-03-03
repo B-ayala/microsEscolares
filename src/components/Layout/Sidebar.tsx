@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, School, Users, CreditCard, LogOut, Bus } from 'lucide-react';
+import { LayoutDashboard, School, Users, CreditCard, LogOut, Bus, Receipt, Wallet } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -7,7 +7,9 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Escuelas', href: '/schools', icon: School },
   { name: 'Alumnos', href: '/students', icon: Users },
-  { name: 'Pagos', href: '/payments', icon: CreditCard },
+  { name: 'Colectivos', href: '/buses', icon: Bus },
+  { name: 'Control de Gastos', href: '/expenses', icon: Receipt },
+  { name: 'Pagos Empleados', href: '/employee-payments', icon: Wallet },
 ];
 
 export default function Sidebar() {

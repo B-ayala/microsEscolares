@@ -4,17 +4,26 @@ import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { useSchoolStore } from '../../store/useSchoolStore';
 import { useModalStore } from '../../store/useModalStore';
+import type { Nivel, School } from '../../types';
 
-export default function SchoolForm() {
+interface SchoolFormProps {
+  school?: School;
+}
+
+export default function SchoolForm({ school }: SchoolFormProps) {
   const addSchool = useSchoolStore((state) => state.addSchool);
+  const editSchool = useSchoolStore((state) => state.editSchool);
   const closeModal = useModalStore((state) => state.closeModal);
 
+  const isEditing = !!school;
+
   const [formData, setFormData] = useState({
-    nombre: '',
-    direccion: '',
-    telefono: '',
-    email: '',
-    estado: 'Activa' as 'Activa' | 'Inactiva',
+    nombre: school?.nombre ?? '',
+    direccion: school?.direccion ?? '',
+    telefono: school?.telefono ?? '',
+    email: school?.email ?? '',
+    nivel: (school?.nivel ?? 'Primaria') as Nivel,
+    estado: (school?.estado ?? 'Activa') as 'Activa' | 'Inactiva',
   });
 
   const [errors, setErrors] = useState<{ nombre?: string; direccion?: string }>({});
@@ -34,13 +43,25 @@ export default function SchoolForm() {
       return;
     }
 
-    addSchool({
-      nombre: formData.nombre.trim(),
-      direccion: formData.direccion.trim(),
-      telefono: formData.telefono.trim() || undefined,
-      email: formData.email.trim() || undefined,
-      estado: formData.estado,
-    });
+    if (isEditing) {
+      editSchool(school!.id, {
+        nombre: formData.nombre.trim(),
+        direccion: formData.direccion.trim(),
+        telefono: formData.telefono.trim() || undefined,
+        email: formData.email.trim() || undefined,
+        nivel: formData.nivel,
+        estado: formData.estado,
+      });
+    } else {
+      addSchool({
+        nombre: formData.nombre.trim(),
+        direccion: formData.direccion.trim(),
+        telefono: formData.telefono.trim() || undefined,
+        email: formData.email.trim() || undefined,
+        nivel: formData.nivel,
+        estado: formData.estado,
+      });
+    }
 
     closeModal();
   };
@@ -108,6 +129,24 @@ export default function SchoolForm() {
       </div>
 
       <div>
+        <label htmlFor="nivel" className="block text-sm font-medium text-gray-700 mb-1">
+          Nivel
+        </label>
+        <select
+          id="nivel"
+          title="Nivel"
+          className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          value={formData.nivel}
+          onChange={(e) => setFormData({ ...formData, nivel: e.target.value as Nivel })}
+        >
+          <option value="Jardín">Jardín</option>
+          <option value="Primaria">Primaria</option>
+          <option value="Secundaria">Secundaria</option>
+          <option value="Escuela Unificada">Escuela Unificada</option>
+        </select>
+      </div>
+
+      <div>
         <label htmlFor="estado" className="block text-sm font-medium text-gray-700 mb-1">
           Estado
         </label>
@@ -128,7 +167,7 @@ export default function SchoolForm() {
           Cancelar
         </Button>
         <Button type="submit" disabled={!isFormValid}>
-          Guardar Escuela
+          {isEditing ? 'Guardar Cambios' : 'Guardar Escuela'}
         </Button>
       </div>
     </form>
