@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { Plus, Search, Bus as BusIcon, Users, MapPin, Wrench } from 'lucide-react';
+import { useState } from 'react';
+import { Plus, Search, Bus as BusIcon, Users } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Badge } from '../../components/ui/Badge';
@@ -46,7 +46,7 @@ function BusForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Patente *</label>
           <Input value={form.patente} onChange={(e) => setForm({ ...form, patente: e.target.value })} placeholder="AB 123 CD" />
@@ -56,7 +56,7 @@ function BusForm() {
           <Input type="number" value={form.capacidad} onChange={(e) => setForm({ ...form, capacidad: e.target.value })} />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Conductor *</label>
           <Input value={form.conductor} onChange={(e) => setForm({ ...form, conductor: e.target.value })} />
@@ -66,7 +66,7 @@ function BusForm() {
           <Input value={form.celador} onChange={(e) => setForm({ ...form, celador: e.target.value })} />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Turno</label>
           <select value={form.turno} onChange={(e) => setForm({ ...form, turno: e.target.value as Turno })}

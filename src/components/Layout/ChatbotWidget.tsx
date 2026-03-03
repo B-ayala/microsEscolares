@@ -123,7 +123,7 @@ export default function ChatbotWidget() {
       <div
         className={twMerge(
           clsx(
-            'fixed bottom-6 right-6 w-[350px] max-h-[500px] h-[calc(100vh-100px)] bg-white rounded-2xl shadow-2xl flex flex-col z-50 transition-all duration-300 origin-bottom-right overflow-hidden border border-gray-100',
+            'fixed bottom-0 right-0 sm:bottom-6 sm:right-6 w-full sm:w-[350px] max-h-full sm:max-h-[500px] h-[100dvh] sm:h-[calc(100vh-100px)] bg-white sm:rounded-2xl shadow-2xl flex flex-col z-50 transition-all duration-300 origin-bottom-right overflow-hidden border border-gray-100',
             isOpen ? 'scale-100 opacity-100 pointer-events-auto' : 'scale-50 opacity-0 pointer-events-none'
           )
         )}

@@ -59,30 +59,28 @@ export default function Dashboard() {
 
       {/* Alerts */}
       {totalImpagos.length > 0 && diasMora === 0 && (
-        <div
-          className="bg-orange-50 border border-orange-200 text-orange-800 px-4 py-3 rounded-lg text-sm flex items-center gap-2 cursor-pointer hover:bg-orange-100 transition-colors"
+        <div className="bg-orange-50 border border-orange-200 text-orange-800 px-4 py-3 rounded-lg text-sm flex flex-wrap items-center gap-2 cursor-pointer hover:bg-orange-100 transition-colors"
           onClick={() => navigate('/students?filterPago=impago')}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => e.key === 'Enter' && navigate('/students?filterPago=impago')}
         >
           <AlertTriangle className="w-4 h-4 shrink-0" />
-          <span><strong>{totalImpagos.length} alumno(s) con pago impago.</strong> Monto pendiente: <strong>{formatCurrency(deudaImpagos)}</strong></span>
-          <span className="ml-auto text-xs font-medium underline whitespace-nowrap">Ver alumnos →</span>
+          <span className="flex-1"><strong>{totalImpagos.length} alumno(s) con pago impago.</strong> Monto pendiente: <strong>{formatCurrency(deudaImpagos)}</strong></span>
+          <span className="text-xs font-medium underline whitespace-nowrap">Ver alumnos →</span>
         </div>
       )}
 
       {totalImpagos.length > 0 && diasMora > 0 && (
-        <div
-          className="bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-lg text-sm flex items-center gap-2 cursor-pointer hover:bg-red-100 transition-colors"
+        <div className="bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-lg text-sm flex flex-wrap items-center gap-2 cursor-pointer hover:bg-red-100 transition-colors"
           onClick={() => navigate('/students?filterPago=vencido_con_mora')}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => e.key === 'Enter' && navigate('/students?filterPago=vencido_con_mora')}
         >
           <AlertCircle className="w-4 h-4 shrink-0" />
-          <span><strong>{totalImpagos.length} alumno(s) vencido(s) con mora</strong> ({diasMora} días de mora). Monto pendiente con recargo: <strong>{formatCurrency(deudaImpagos)}</strong></span>
-          <span className="ml-auto text-xs font-medium underline whitespace-nowrap">Ver alumnos →</span>
+          <span className="flex-1"><strong>{totalImpagos.length} alumno(s) vencido(s) con mora</strong> ({diasMora} días de mora). Monto pendiente con recargo: <strong>{formatCurrency(deudaImpagos)}</strong></span>
+          <span className="text-xs font-medium underline whitespace-nowrap">Ver alumnos →</span>
         </div>
       )}
 
@@ -93,7 +91,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500">Alumnos Activos</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{totalAlumnos}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">{totalAlumnos}</p>
               </div>
               <div className="p-3 bg-blue-50 rounded-lg"><Users className="w-6 h-6 text-primary" /></div>
             </div>
@@ -105,7 +103,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500">Total Recaudado (Mes)</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{formatCurrency(recaudado)}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">{formatCurrency(recaudado)}</p>
                 <p className="text-xs text-green-600 mt-1">{totalPagados.length} pagos</p>
               </div>
               <div className="p-3 bg-green-50 rounded-lg"><DollarSign className="w-6 h-6 text-green-600" /></div>
@@ -118,7 +116,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500">Total Adeudado (Mes)</p>
-                <p className="text-3xl font-bold text-danger mt-2">{formatCurrency(adeudado)}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-danger mt-2">{formatCurrency(adeudado)}</p>
                 <p className="text-xs text-red-500 mt-1">{totalImpagos.length} impagos · {totalEnEspera.length} en espera</p>
               </div>
               <div className="p-3 bg-red-50 rounded-lg"><AlertCircle className="w-6 h-6 text-danger" /></div>
@@ -131,7 +129,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500">Balance Mensual</p>
-                <p className={`text-3xl font-bold mt-2 ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatCurrency(balance)}</p>
+                <p className={`text-2xl sm:text-3xl font-bold mt-2 ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatCurrency(balance)}</p>
                 <p className="text-xs text-gray-400 mt-1">Ingresos - Gastos ({formatCurrency(gastosMes)})</p>
               </div>
               <div className={`p-3 rounded-lg ${balance >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>

@@ -204,7 +204,7 @@ export default function Students() {
       )}
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
             <div className="p-2 bg-blue-50 rounded-lg"><Search className="w-5 h-5 text-primary" /></div>

@@ -137,7 +137,7 @@ export default function Schools() {
         </div>
 
         {/* KPIs de la escuela */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card>
             <CardContent className="p-4 flex items-center gap-3">
               <div className="p-2 bg-blue-50 rounded-lg"><Building2 className="w-5 h-5 text-primary" /></div>
@@ -304,7 +304,7 @@ export default function Schools() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500">Total Alumnos Activos</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{totalAlumnos}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">{totalAlumnos}</p>
               </div>
               <div className="p-3 bg-blue-50 rounded-lg">
                 <Building2 className="w-6 h-6 text-primary" />
@@ -317,7 +317,7 @@ export default function Schools() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500">Monto Facturado Estimado (Mensual)</p>
-                <p className="text-3xl font-bold text-green-600 mt-2">{formatCurrency(totalFacturado)}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-green-600 mt-2">{formatCurrency(totalFacturado)}</p>
               </div>
               <div className="p-3 bg-green-50 rounded-lg">
                 <span className="text-xl font-bold text-green-600">$</span>

@@ -24,7 +24,7 @@ function EmployeeForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
           <Input value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} />
@@ -34,7 +34,7 @@ function EmployeeForm() {
           <Input value={form.apellido} onChange={(e) => setForm({ ...form, apellido: e.target.value })} />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Rol</label>
           <select value={form.rol} onChange={(e) => setForm({ ...form, rol: e.target.value as RolEmpleado })}
