@@ -8,7 +8,7 @@
 
 - **SPA frontend-only**, sin backend ni autenticación.
 - Datos en memoria (Zustand) con seeds que se cargan en cada refresh.
-- Distribución estática vía GitHub Pages.
+- Distribución estática vía Vercel (preset Vite).
 
 ---
 
@@ -37,7 +37,7 @@
 
 - **React 19** (`StrictMode` activo).
 - **TypeScript ~5.9** con `tsc -b` antes del build.
-- **Vite 7** (`base: '/microsEscolares/'`).
+- **Vite 7** (`base: '/'`).
 - **Tailwind CSS v4** vía `@tailwindcss/vite`.
 - **Zustand 5** sin middleware de persistencia.
 - **react-router-dom 7** con `HashRouter`.
@@ -156,9 +156,11 @@ HashRouter
 
 ## Deploy
 
-- Branch `gh-pages` con `gh-pages -d dist`.
-- Script `deploy` copia `dist/index.html → dist/404.html` para fallback SPA.
-- Base path: `/microsEscolares/` (configurado en `vite.config.ts`).
+- **Vercel** con preset Vite. Build command `npm run build`, output `dist`, install `npm install`.
+- `vercel.json` define un rewrite `/:path*` → `/index.html` (defensivo: el routing real es client-side con `HashRouter`, pero el rewrite cubre cualquier path pegado directo).
+- Base path: `/` (configurado en `vite.config.ts`).
+- Auto-deploy: cada push a `main` dispara un Production Deployment; las demás ramas / PRs generan Preview Deployments.
+- Sin variables de entorno (proyecto in-memory, sin secrets).
 
 ---
 

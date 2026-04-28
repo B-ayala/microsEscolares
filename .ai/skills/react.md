@@ -8,16 +8,16 @@
 
 | Capa            | Herramienta                            | Versión / Notas                           |
 |-----------------|----------------------------------------|-------------------------------------------|
-| Build           | Vite + `@vitejs/plugin-react`          | 7.x · `base: '/microsEscolares/'`         |
+| Build           | Vite + `@vitejs/plugin-react`          | 7.x · `base: '/'`                         |
 | Lenguaje        | TypeScript estricto                    | ~5.9                                      |
 | UI              | React                                  | 19.x · `StrictMode`                       |
 | Estilos         | Tailwind CSS v4 (`@tailwindcss/vite`)  | tokens en `@theme` dentro de `index.css`  |
 | Estado global   | Zustand                                | 5.x · un store por dominio                |
-| Routing         | react-router-dom                       | 7.x con **`HashRouter`** (GH Pages)       |
+| Routing         | react-router-dom                       | 7.x con **`HashRouter`** (decisión del proyecto) |
 | Gráficos        | Recharts                               | 3.x                                       |
 | Iconos          | lucide-react                           | última                                    |
 | Utilidades      | clsx + tailwind-merge                  | combinadas en `cn()`                      |
-| Deploy          | gh-pages                               | branch `gh-pages` · fallback 404.html     |
+| Deploy          | Vercel (preset Vite)                   | rewrite SPA en `vercel.json`              |
 
 **Sin** backend, **sin** auth, **sin** persistencia. Todo en memoria (Zustand recarga seeds en cada refresh).
 
@@ -80,7 +80,7 @@ src/
 </HashRouter>
 ```
 
-- **`HashRouter` es obligatorio** (GH Pages no tiene rewrite server-side).
+- **`HashRouter` es la decisión vigente del proyecto** (heredada de GH Pages; Vercel soportaría BrowserRouter pero no se cambió para no romper URLs ya distribuidas).
 - **No hay rutas para forms** (`/students/new`, `/students/:id/edit` están prohibidos). Forms van en modal.
 - Comunicación cross-página vía **query params** (`?filterPago=impago`). El consumidor lee con `useSearchParams`, aplica el filtro y limpia el URL con `setSearchParams({}, { replace: true })`.
 
@@ -418,11 +418,11 @@ npm run dev        # vite dev server (5173)
 npm run build      # tsc -b && vite build
 npm run preview    # preview de dist/
 npm run lint       # eslint
-npm run deploy     # build + copia 404.html + push gh-pages
 ```
 
-- `vite.config.ts` tiene `base: '/microsEscolares/'`. **No tocar** salvo cambio de repo.
-- El script `deploy` copia `dist/index.html` a `dist/404.html` para el fallback SPA.
+- Deploy a **Vercel** (preset Vite). Push a `main` → Production; cualquier otra rama / PR → Preview. No hay script manual de deploy.
+- `vite.config.ts` tiene `base: '/'`. **No tocar** salvo cambio de hosting.
+- `vercel.json` define rewrite SPA `/:path* → /index.html` (defensivo, redundante con HashRouter pero cubre paths pegados directo).
 
 ---
 

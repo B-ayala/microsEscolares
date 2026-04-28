@@ -40,13 +40,12 @@
     "navigation": "sidebar fijo desktop, drawer mobile con backdrop"
   },
   "deployment": {
-    "target": "github-pages",
-    "branch": "gh-pages",
-    "basePath": "/microsEscolares/",
-    "spaFallback": "dist/index.html copiado a dist/404.html",
+    "target": "vercel",
+    "framework": "vite",
+    "basePath": "/",
+    "spaFallback": "vercel.json rewrite /:path* → /index.html",
     "scripts": {
-      "build": "tsc -b && vite build",
-      "deploy": "cp dist/index.html dist/404.html && gh-pages -d dist"
+      "build": "tsc -b && vite build"
     }
   },
   "ports": { "dev": 5173 },

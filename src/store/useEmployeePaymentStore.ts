@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Employee, EmployeePayment, RolEmpleado } from '../types';
+import type { Employee, EmployeePayment } from '../types';
 import { mesActualKey } from '../utils/payments';
 
 interface EmployeePaymentState {

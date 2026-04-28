@@ -12,7 +12,7 @@ Reglas obligatorias para cualquier código generado o modificado en MicrosMiguel
 - **NO** crear stores nuevos para UI efímera. Hay un único store de UI: `useModalStore`. Usá `useState` local para el resto.
 - **NO** mutar arrays del store desde el componente. Toda mutación va por una acción del store.
 - **NO** agregar persistencia (localStorage, IndexedDB, backend) sin que el usuario lo pida explícitamente. El proyecto es in-memory.
-- **NO** introducir un router distinto. Es `HashRouter` por restricción de GitHub Pages.
+- **NO** introducir un router distinto. Es `HashRouter` (decisión vigente del proyecto, heredada de GH Pages; en Vercel sería técnicamente posible BrowserRouter pero el cambio requiere acuerdo explícito).
 
 ---
 
@@ -93,7 +93,7 @@ Reglas obligatorias para cualquier código generado o modificado en MicrosMiguel
 
 ## ❌ Routing
 
-- **NO** usar `BrowserRouter`. Es `HashRouter`.
+- **NO** usar `BrowserRouter` sin pedido explícito. Es `HashRouter` (ver Arquitectura).
 - **NO** crear links sin `<NavLink>` o `<Link>` (sin `<a href>` para navegación interna).
 - **NO** dejar query params huérfanos. Si los leés y aplicás un filtro, limpialos con `setSearchParams({}, { replace: true })`.
 

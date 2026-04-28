@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, DollarSign, AlertCircle, School, AlertTriangle, TrendingDown } from 'lucide-react';
+import { Users, DollarSign, AlertCircle, AlertTriangle, TrendingDown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line,

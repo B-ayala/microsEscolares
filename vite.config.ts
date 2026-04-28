@@ -4,6 +4,6 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/microsEscolares/',
+  base: '/',
   plugins: [react(), tailwindcss()],
 })

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Expense, TipoGasto } from '../types';
+import type { Expense } from '../types';
 import { mesActualKey } from '../utils/payments';
 
 interface ExpenseState {

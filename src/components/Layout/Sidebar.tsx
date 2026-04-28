@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, School, Users, CreditCard, LogOut, Bus, Receipt, Wallet, X } from 'lucide-react';
+import { LayoutDashboard, School, Users, LogOut, Bus, Receipt, Wallet, X } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
