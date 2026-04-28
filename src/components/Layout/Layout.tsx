@@ -1,13 +1,43 @@
-import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import Sidebar from './Sidebar';
 import ChatbotWidget from './ChatbotWidget';
 import GlobalModal from '../modal/GlobalModal';
-import { cn } from '../ui/Button'; // Assuming cn inside Button handles tailwind merges well
+import { PageLoader } from '../ui/PageLoader';
+import { cn } from '../ui/Button';
+
+const SECTION_TITLES: Record<string, string> = {
+  '/dashboard': 'Inicio',
+  '/schools': 'Escuelas',
+  '/students': 'Alumnos',
+  '/payments': 'Pagos',
+  '/buses': 'Colectivos',
+  '/expenses': 'Gastos',
+  '/employee-payments': 'Empleados',
+};
 
 export default function Layout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const sectionTitle = SECTION_TITLES[location.pathname] ?? 'MicrosMiguel';
+
+  const [isNavigating, setIsNavigating] = useState(true);
+  useEffect(() => {
+    setIsNavigating(true);
+    const t = setTimeout(() => setIsNavigating(false), 450);
+    return () => clearTimeout(t);
+  }, [location.pathname]);
+
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setIsInitialLoad(false), 900);
+    return () => clearTimeout(t);
+  }, []);
+
+  if (isInitialLoad) {
+    return <PageLoader fullScreen />;
+  }
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden relative">
@@ -35,21 +65,22 @@ export default function Layout() {
       <div className="flex flex-col flex-1 min-w-0">
         {/* Mobile Header */}
         <header className="md:hidden bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 shrink-0">
-          <span className="font-bold text-lg text-gray-900">TranspoSys</span>
           <button
             onClick={() => setIsMobileMenuOpen(true)}
-            className="p-2 -mr-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary rounded-md"
-            aria-label="Abrir menú"
+            className="inline-flex items-center justify-center min-h-[48px] min-w-[48px] -ml-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/40 rounded-lg"
+            aria-label="Abrir menú de navegación"
           >
-            <Menu className="w-6 h-6" />
+            <Menu className="w-7 h-7" />
           </button>
+          <h1 className="font-bold text-xl text-gray-900 truncate">{sectionTitle}</h1>
+          <span className="min-w-[48px]" aria-hidden="true" />
         </header>
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto w-full">
           {/* Contenedor centralizado con márgenes seguros y padding progresivo */}
           <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-            <Outlet />
+            {isNavigating ? <PageLoader /> : <Outlet />}
           </div>
         </main>
       </div>

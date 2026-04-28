@@ -1,4 +1,4 @@
-// ── Tipos principales del sistema TranspoSys ──
+// ── Tipos principales del sistema MicrosMiguel ──
 
 export type Turno = 'Mañana' | 'Tarde';
 export type Nivel = 'Jardín' | 'Primaria' | 'Secundaria' | 'Escuela Unificada';

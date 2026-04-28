@@ -1,17 +1,22 @@
 import { useState, useMemo } from 'react';
-import { Plus, Search, MapPin, Phone, Building2, ArrowLeft, ChevronRight, AlertCircle, CheckCircle2, Clock, Pencil, Trash2 } from 'lucide-react';
+import {
+  Plus, Search, MapPin, Phone, Building2, ArrowLeft, ChevronRight,
+  AlertCircle, CheckCircle2, Clock, Pencil, Trash2, Banknote, Wallet,
+} from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
+import { Select } from '../../components/ui/Select';
 import { Badge } from '../../components/ui/Badge';
 import { Card, CardContent } from '../../components/ui/Card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/Table';
 import { useSchoolStore } from '../../store/useSchoolStore';
 import { useStudentStore } from '../../store/useStudentStore';
 import { useModalStore } from '../../store/useModalStore';
+import { openConfirmDelete } from '../../components/modal/confirm';
 import SchoolForm from '../../components/forms/SchoolForm';
 import StudentForm from '../../components/forms/StudentForm';
 import { formatCurrency, calcularMontoConRecargo, calcularDiasMora } from '../../utils/payments';
-import type { Turno, Nivel, EstadoPago, TipoPago } from '../../types';
+import type { Turno, Nivel, EstadoPago } from '../../types';
 
 function translateEstado(estado: EstadoPago): string {
   switch (estado) {
@@ -26,23 +31,19 @@ export default function Schools() {
   const schools = useSchoolStore((state) => state.schools);
   const selectedSchoolId = useSchoolStore((state) => state.selectedSchoolId);
   const selectSchool = useSchoolStore((state) => state.selectSchool);
-  const editSchool = useSchoolStore((state) => state.editSchool);
   const deleteSchool = useSchoolStore((state) => state.deleteSchool);
   const students = useStudentStore((state) => state.students);
   const marcarPagado = useStudentStore((state) => state.marcarPagado);
   const desmarcarPago = useStudentStore((state) => state.desmarcarPago);
-  const editStudent = useStudentStore((state) => state.editStudent);
   const deleteStudentStore = useStudentStore((state) => state.deleteStudent);
   const openModal = useModalStore((state) => state.openModal);
 
-  // Filters for students inside school
   const [filterTurno, setFilterTurno] = useState<Turno | 'all'>('all');
   const [filterNivel, setFilterNivel] = useState<Nivel | 'all'>('all');
   const [filterEstado, setFilterEstado] = useState<EstadoPago | 'all'>('all');
 
   const selectedSchool = schools.find((s) => s.id === selectedSchoolId);
 
-  // Students filtered by selected school
   const schoolStudents = useMemo(() => {
     if (!selectedSchoolId) return [];
     return students.filter((s) => {
@@ -54,7 +55,6 @@ export default function Schools() {
     });
   }, [students, selectedSchoolId, filterTurno, filterNivel, filterEstado]);
 
-  // School-level computed data
   const schoolStats = useMemo(() => {
     return schools.map((school) => {
       const alumnos = students.filter((s) => s.escuelaId === school.id && s.estado === 'active');
@@ -74,48 +74,32 @@ export default function Schools() {
   const totalAlumnos = schoolStats.reduce((acc, s) => acc + s.totalAlumnos, 0);
   const totalFacturado = schoolStats.reduce((acc, s) => acc + s.facturado, 0);
 
-  const handleOpenNewSchoolModal = () => {
-    openModal('Registrar Nueva Escuela', <SchoolForm />);
-  };
+  const handleOpenNewSchoolModal = () => openModal('Registrar Nueva Escuela', <SchoolForm />);
 
-  const handleEditSchool = (school: typeof schools[0]) => {
+  const handleEditSchool = (school: typeof schools[0]) =>
     openModal('Editar Escuela', <SchoolForm school={school} />);
-  };
 
   const handleDeleteSchool = (school: typeof schools[0]) => {
     const alumnosCount = students.filter((s) => s.escuelaId === school.id && s.estado === 'active').length;
-    openModal(
-      'Eliminar Escuela',
-      <div className="space-y-4">
-        <p className="text-gray-600">¿Estás seguro de que deseas eliminar la escuela <strong>{school.nombre}</strong>?</p>
-        {alumnosCount > 0 && (
-          <p className="text-sm text-amber-600">Esta escuela tiene {alumnosCount} alumno(s) activo(s) asociado(s).</p>
-        )}
-        <p className="text-sm text-red-600">Esta acción no se puede deshacer.</p>
-        <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-          <Button variant="outline" onClick={() => useModalStore.getState().closeModal()}>Cancelar</Button>
-          <Button className="bg-red-600 hover:bg-red-700 text-white" onClick={() => { deleteSchool(school.id); useModalStore.getState().closeModal(); }}>Eliminar</Button>
-        </div>
-      </div>
-    );
+    openConfirmDelete({
+      title: 'Eliminar Escuela',
+      message: <>¿Querés eliminar la escuela <strong>{school.nombre}</strong>?</>,
+      warning: alumnosCount > 0
+        ? <>Esta escuela tiene <strong>{alumnosCount} alumno(s) activo(s)</strong> asociado(s).</>
+        : undefined,
+      onConfirm: () => deleteSchool(school.id),
+    });
   };
 
-  const handleEditStudentInSchool = (student: typeof students[0]) => {
+  const handleEditStudentInSchool = (student: typeof students[0]) =>
     openModal('Editar Alumno', <StudentForm student={student} />);
-  };
 
   const handleDeleteStudentInSchool = (student: typeof students[0]) => {
-    openModal(
-      'Eliminar Alumno',
-      <div className="space-y-4">
-        <p className="text-gray-600">¿Estás seguro de que deseas eliminar al alumno <strong>{student.apellido}, {student.nombre}</strong>?</p>
-        <p className="text-sm text-red-600">Esta acción no se puede deshacer.</p>
-        <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-          <Button variant="outline" onClick={() => useModalStore.getState().closeModal()}>Cancelar</Button>
-          <Button className="bg-red-600 hover:bg-red-700 text-white" onClick={() => { deleteStudentStore(student.id); useModalStore.getState().closeModal(); }}>Eliminar</Button>
-        </div>
-      </div>
-    );
+    openConfirmDelete({
+      title: 'Eliminar Alumno',
+      message: <>¿Querés eliminar al alumno <strong>{student.apellido}, {student.nombre}</strong>?</>,
+      onConfirm: () => deleteStudentStore(student.id),
+    });
   };
 
   const now = new Date();
@@ -126,160 +110,222 @@ export default function Schools() {
     const stats = schoolStats.find((s) => s.id === selectedSchool.id);
     return (
       <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => { selectSchool(null); setFilterTurno('all'); setFilterNivel('all'); setFilterEstado('all'); }}>
-            <ArrowLeft className="w-4 h-4 mr-1" /> Volver
+        <div className="flex flex-col gap-3">
+          <Button variant="outline" size="md" className="self-start" onClick={() => { selectSchool(null); setFilterTurno('all'); setFilterNivel('all'); setFilterEstado('all'); }}>
+            <ArrowLeft className="w-5 h-5 mr-2" /> Volver a Escuelas
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{selectedSchool.nombre}</h1>
-            <p className="text-gray-500 text-sm mt-0.5">{selectedSchool.direccion} · {selectedSchool.nivel}</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{selectedSchool.nombre}</h1>
+            <p className="text-gray-700 text-base mt-1">{selectedSchool.direccion} · {selectedSchool.nivel}</p>
           </div>
         </div>
 
-        {/* KPIs de la escuela */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {/* KPIs */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card>
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-2 bg-blue-50 rounded-lg"><Building2 className="w-5 h-5 text-primary" /></div>
+              <div className="p-2.5 bg-blue-50 rounded-xl"><Building2 className="w-6 h-6 text-primary" /></div>
               <div>
-                <p className="text-xs text-gray-500">Alumnos</p>
-                <p className="text-xl font-bold">{stats?.totalAlumnos ?? 0}</p>
+                <p className="text-sm font-medium text-gray-600">Alumnos</p>
+                <p className="text-2xl font-bold text-gray-900">{stats?.totalAlumnos ?? 0}</p>
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-2 bg-green-50 rounded-lg"><CheckCircle2 className="w-5 h-5 text-green-600" /></div>
+              <div className="p-2.5 bg-green-50 rounded-xl"><CheckCircle2 className="w-6 h-6 text-green-700" /></div>
               <div>
-                <p className="text-xs text-gray-500">Pagados</p>
-                <p className="text-xl font-bold text-green-600">{stats?.pagados ?? 0}</p>
+                <p className="text-sm font-medium text-gray-600">Pagados</p>
+                <p className="text-2xl font-bold text-green-700">{stats?.pagados ?? 0}</p>
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-2 bg-yellow-50 rounded-lg"><Clock className="w-5 h-5 text-yellow-600" /></div>
+              <div className="p-2.5 bg-yellow-50 rounded-xl"><Clock className="w-6 h-6 text-yellow-700" /></div>
               <div>
-                <p className="text-xs text-gray-500">En espera</p>
-                <p className="text-xl font-bold text-yellow-600">{stats?.enEspera ?? 0}</p>
+                <p className="text-sm font-medium text-gray-600">En espera</p>
+                <p className="text-2xl font-bold text-yellow-700">{stats?.enEspera ?? 0}</p>
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-2 bg-red-50 rounded-lg"><AlertCircle className="w-5 h-5 text-red-600" /></div>
+              <div className="p-2.5 bg-red-50 rounded-xl"><AlertCircle className="w-6 h-6 text-red-700" /></div>
               <div>
-                <p className="text-xs text-gray-500">Impagos</p>
-                <p className="text-xl font-bold text-red-600">{stats?.impagos ?? 0}</p>
+                <p className="text-sm font-medium text-gray-600">Impagos</p>
+                <p className="text-2xl font-bold text-red-700">{stats?.impagos ?? 0}</p>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Filtros */}
-        <div className="bg-white rounded-xl shadow-soft border border-gray-200 overflow-hidden text-sm">
-          <div className="p-4 border-b border-gray-200 flex flex-wrap gap-3 items-center bg-gray-50/50">
-            <select value={filterTurno} onChange={(e) => setFilterTurno(e.target.value as any)} title="Turno"
-              className="h-9 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary">
-              <option value="all">Todos los turnos</option>
-              <option value="Mañana">Mañana</option>
-              <option value="Tarde">Tarde</option>
-            </select>
-            <select value={filterNivel} onChange={(e) => setFilterNivel(e.target.value as any)} title="Nivel"
-              className="h-9 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary">
-              <option value="all">Todos los niveles</option>
-              <option value="Jardín">Jardín</option>
-              <option value="Primaria">Primaria</option>
-              <option value="Secundaria">Secundaria</option>
-              <option value="Escuela Unificada">Escuela Unificada</option>
-            </select>
-            <select value={filterEstado} onChange={(e) => setFilterEstado(e.target.value as any)} title="Estado"
-              className="h-9 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary">
-              <option value="all">Todos los estados</option>
-              <option value="en_espera">En espera</option>
-              <option value="pagado">Pagado</option>
-              <option value="impago">Impago</option>
-            </select>
+        {/* Filtros + listado */}
+        <div className="bg-white rounded-xl shadow-soft border border-gray-200 overflow-hidden">
+          <div className="p-4 border-b border-gray-200 bg-gray-50/50 space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <Select value={filterTurno} onChange={(e) => setFilterTurno(e.target.value as Turno | 'all')} aria-label="Filtrar por turno">
+                <option value="all">Todos los turnos</option>
+                <option value="Mañana">Mañana</option>
+                <option value="Tarde">Tarde</option>
+              </Select>
+              <Select value={filterNivel} onChange={(e) => setFilterNivel(e.target.value as Nivel | 'all')} aria-label="Filtrar por nivel">
+                <option value="all">Todos los niveles</option>
+                <option value="Jardín">Jardín</option>
+                <option value="Primaria">Primaria</option>
+                <option value="Secundaria">Secundaria</option>
+                <option value="Escuela Unificada">Escuela Unificada</option>
+              </Select>
+              <Select value={filterEstado} onChange={(e) => setFilterEstado(e.target.value as EstadoPago | 'all')} aria-label="Filtrar por estado de pago">
+                <option value="all">Todos los estados</option>
+                <option value="en_espera">En espera</option>
+                <option value="pagado">Pagado</option>
+                <option value="impago">Impago</option>
+              </Select>
+            </div>
             {diasMora > 0 && (
-              <span className="ml-auto text-xs text-red-600 font-medium bg-red-50 px-2 py-1 rounded-full">
-                ⚠ {diasMora} días de mora
-              </span>
+              <p className="text-sm font-semibold text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                ⚠ {diasMora} días de mora vigente
+              </p>
             )}
           </div>
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Alumno</TableHead>
-                <TableHead>Nivel</TableHead>
-                <TableHead>Turno</TableHead>
-                <TableHead className="text-right">Monto</TableHead>
-                <TableHead className="text-center">Estado</TableHead>
-                <TableHead className="text-center">Fecha Pago</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {schoolStudents.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center text-gray-400 py-8">No se encontraron alumnos con los filtros seleccionados.</TableCell>
-                </TableRow>
-              ) : (
-                schoolStudents.map((student) => {
-                  const montoFinal = student.estadoPago !== 'pagado' ? calcularMontoConRecargo(student.valor, now) : student.valor;
-                  return (
-                    <TableRow key={student.id} className={student.estadoPago === 'impago' ? 'bg-red-50/50' : ''}>
-                      <TableCell className="font-medium text-gray-900">{student.apellido}, {student.nombre}</TableCell>
-                      <TableCell>{student.nivel}</TableCell>
-                      <TableCell>{student.turno}</TableCell>
-                      <TableCell className="text-right font-medium">
-                        {formatCurrency(montoFinal)}
-                        {student.estadoPago !== 'pagado' && montoFinal > student.valor && (
-                          <span className="block text-xs text-red-500">+{Math.round(((montoFinal / student.valor) - 1) * 100)}%</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Badge status={student.estadoPago}>{translateEstado(student.estadoPago)}</Badge>
-                      </TableCell>
-                      <TableCell className="text-center text-gray-500 text-xs">
-                        {student.fechaPago ? student.fechaPago.split('-').reverse().join('/') : '-'}
-                        {student.tipoPago && <span className="block text-gray-400">{student.tipoPago}</span>}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          {student.estadoPago !== 'pagado' ? (
-                            <>
-                              <Button variant="ghost" size="sm" className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                                onClick={() => marcarPagado(student.id, 'Efectivo')}>
-                                <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Efectivo
-                              </Button>
-                              <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                onClick={() => marcarPagado(student.id, 'Mercado Pago')}>
-                                MP
-                              </Button>
-                            </>
-                          ) : (
-                            <Button variant="ghost" size="sm" className="text-gray-500 hover:text-red-600"
-                              onClick={() => desmarcarPago(student.id)}>
-                              Revertir
-                            </Button>
-                          )}
-                          <Button variant="ghost" size="sm" className="text-gray-500 hover:text-primary hover:bg-violet-50"
-                            onClick={() => handleEditStudentInSchool(student)}>
-                            <Pencil className="w-3.5 h-3.5" />
+          {/* Mobile cards */}
+          <div className="md:hidden divide-y divide-gray-200">
+            {schoolStudents.length === 0 ? (
+              <p className="text-center text-gray-500 py-10 text-base">No se encontraron alumnos con los filtros seleccionados.</p>
+            ) : (
+              schoolStudents.map((student) => {
+                const montoFinal = student.estadoPago !== 'pagado' ? calcularMontoConRecargo(student.valor, now) : student.valor;
+                const isImpago = student.estadoPago === 'impago';
+                return (
+                  <div key={student.id} className={`p-5 ${isImpago ? 'bg-red-50/50' : ''}`}>
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div>
+                        <p className="text-lg font-semibold text-gray-900">{student.apellido}, {student.nombre}</p>
+                        <p className="text-sm text-gray-700 mt-0.5">{student.turno} · {student.nivel}</p>
+                      </div>
+                      <Badge status={student.estadoPago}>{translateEstado(student.estadoPago)}</Badge>
+                    </div>
+                    <p className="text-base font-semibold text-gray-900 mb-3">{formatCurrency(montoFinal)}</p>
+                    <div className="space-y-2">
+                      {student.estadoPago !== 'pagado' ? (
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button size="md" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => marcarPagado(student.id, 'Efectivo')}>
+                            <CheckCircle2 className="w-5 h-5 mr-1.5" /> Efectivo
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-gray-500 hover:text-red-600 hover:bg-red-50"
-                            onClick={() => handleDeleteStudentInSchool(student)}>
-                            <Trash2 className="w-3.5 h-3.5" />
+                          <Button size="md" className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => marcarPagado(student.id, 'Mercado Pago')}>
+                            Mercado Pago
                           </Button>
                         </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
+                      ) : (
+                        <Button variant="outline" size="md" className="w-full" onClick={() => desmarcarPago(student.id)}>
+                          Revertir pago
+                        </Button>
+                      )}
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button variant="outline" size="md" onClick={() => handleEditStudentInSchool(student)}>
+                          <Pencil className="w-5 h-5 mr-1.5" /> Editar
+                        </Button>
+                        <Button variant="outline" size="md" className="text-red-700 border-red-200 hover:bg-red-50 hover:border-red-300" onClick={() => handleDeleteStudentInSchool(student)}>
+                          <Trash2 className="w-5 h-5 mr-1.5" /> Eliminar
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Alumno</TableHead>
+                  <TableHead>Nivel</TableHead>
+                  <TableHead>Turno</TableHead>
+                  <TableHead className="text-right">Monto</TableHead>
+                  <TableHead className="text-center">Estado</TableHead>
+                  <TableHead className="text-center">Fecha pago</TableHead>
+                  <TableHead className="text-center">Forma de pago</TableHead>
+                  <TableHead className="text-center">Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {schoolStudents.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center text-gray-500 py-10 text-base">No se encontraron alumnos con los filtros seleccionados.</TableCell>
+                  </TableRow>
+                ) : (
+                  schoolStudents.map((student) => {
+                    const montoFinal = student.estadoPago !== 'pagado' ? calcularMontoConRecargo(student.valor, now) : student.valor;
+                    return (
+                      <TableRow key={student.id} className={student.estadoPago === 'impago' ? 'bg-red-50/50' : ''}>
+                        <TableCell className="font-semibold text-gray-900">{student.apellido}, {student.nombre}</TableCell>
+                        <TableCell>{student.nivel}</TableCell>
+                        <TableCell>{student.turno}</TableCell>
+                        <TableCell className="text-right font-medium">
+                          {formatCurrency(montoFinal)}
+                          {student.estadoPago !== 'pagado' && montoFinal > student.valor && (
+                            <span className="block text-sm text-red-700 font-medium">+{Math.round(((montoFinal / student.valor) - 1) * 100)}%</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Badge status={student.estadoPago}>{translateEstado(student.estadoPago)}</Badge>
+                        </TableCell>
+                        <TableCell className="text-center text-gray-700 text-sm">
+                          {student.fechaPago ? student.fechaPago.split('-').reverse().join('/') : '—'}
+                        </TableCell>
+                        <TableCell className="text-center whitespace-nowrap">
+                          {student.estadoPago !== 'pagado' ? (
+                            <div className="flex justify-center gap-1.5">
+                              <Button size="sm" className="min-w-[104px] bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+                                onClick={() => marcarPagado(student.id, 'Efectivo')}
+                                aria-label="Marcar como pagado en efectivo">
+                                <Banknote className="w-4 h-4" /> Efectivo
+                              </Button>
+                              <Button size="sm" className="min-w-[72px] bg-sky-500 hover:bg-sky-600 text-white shadow-sm"
+                                onClick={() => marcarPagado(student.id, 'Mercado Pago')}
+                                aria-label="Marcar como pagado por Mercado Pago">
+                                <Wallet className="w-4 h-4" /> MP
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center gap-0.5">
+                              <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-800">
+                                {student.tipoPago === 'Efectivo'
+                                  ? <Banknote className="w-4 h-4 text-emerald-600" aria-hidden="true" />
+                                  : <Wallet className="w-4 h-4 text-sky-500" aria-hidden="true" />}
+                                {student.tipoPago}
+                              </span>
+                              <button type="button" onClick={() => desmarcarPago(student.id)}
+                                className="text-xs text-gray-500 hover:text-red-700 hover:underline underline-offset-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded">
+                                Revertir
+                              </button>
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="flex justify-center gap-1.5">
+                            <Button variant="ghost" size="sm" aria-label="Editar alumno"
+                              onClick={() => handleEditStudentInSchool(student)}>
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" className="text-red-700 hover:bg-red-50" aria-label="Eliminar alumno"
+                              onClick={() => handleDeleteStudentInSchool(student)}>
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </div>
     );
@@ -290,99 +336,158 @@ export default function Schools() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestión de Escuelas</h1>
-          <p className="text-gray-500 text-sm mt-1">Click en una escuela para ver sus alumnos y controlar pagos.</p>
+          <h1 className="hidden md:block text-3xl font-bold text-gray-900">Gestión de Escuelas</h1>
+          <p className="text-gray-600 text-base mt-1">Tocá una escuela para ver sus alumnos y controlar pagos.</p>
         </div>
-        <Button className="shrink-0" onClick={handleOpenNewSchoolModal}>
+        <Button size="lg" className="w-full sm:w-auto shrink-0" onClick={handleOpenNewSchoolModal}>
           <Plus className="w-5 h-5 mr-2" /> Nueva Escuela
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Total Alumnos Activos</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{totalAlumnos}</p>
-              </div>
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <Building2 className="w-6 h-6 text-primary" />
-              </div>
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="p-3 bg-blue-50 rounded-xl"><Building2 className="w-6 h-6 text-primary" /></div>
+            <div>
+              <p className="text-sm font-medium text-gray-600">Alumnos activos totales</p>
+              <p className="text-3xl font-bold text-gray-900">{totalAlumnos}</p>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Monto Facturado Estimado (Mensual)</p>
-                <p className="text-3xl font-bold text-green-600 mt-2">{formatCurrency(totalFacturado)}</p>
-              </div>
-              <div className="p-3 bg-green-50 rounded-lg">
-                <span className="text-xl font-bold text-green-600">$</span>
-              </div>
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="p-3 bg-green-50 rounded-xl"><span className="text-2xl font-bold text-green-700">$</span></div>
+            <div>
+              <p className="text-sm font-medium text-gray-600">Facturación estimada del mes</p>
+              <p className="text-2xl md:text-3xl font-bold text-green-700">{formatCurrency(totalFacturado)}</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="bg-white rounded-xl shadow-soft border border-gray-200 overflow-hidden text-sm">
-        <div className="p-4 border-b border-gray-200 flex flex-col sm:flex-row gap-4 items-center bg-gray-50/50">
+      <div className="bg-white rounded-xl shadow-soft border border-gray-200 overflow-hidden">
+        <div className="p-4 border-b border-gray-200 bg-gray-50/50">
           <div className="relative w-full sm:max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input placeholder="Buscar escuela por nombre o dirección..." className="pl-9" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" aria-hidden="true" />
+            <Input
+              placeholder="Buscar escuela por nombre o dirección..."
+              className="pl-12"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              aria-label="Buscar escuela"
+            />
           </div>
         </div>
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[250px]">Establecimiento</TableHead>
-              <TableHead>Contacto</TableHead>
-              <TableHead>Nivel</TableHead>
-              <TableHead className="text-center">Alumnos</TableHead>
-              <TableHead className="text-center">Pagados</TableHead>
-              <TableHead className="text-center">Impagos</TableHead>
-              <TableHead className="text-right">Facturado</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
-              <TableHead className="w-10"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredSchools.map((school) => (
-              <TableRow key={school.id} className="cursor-pointer hover:bg-violet-50/50 transition-colors" onClick={() => selectSchool(school.id)}>
-                <TableCell>
-                  <p className="font-medium text-gray-900">{school.nombre}</p>
-                </TableCell>
-                <TableCell>
-                  <div className="space-y-1 text-gray-500 text-xs">
-                    <div className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />{school.direccion}</div>
-                    {school.telefono && <div className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" />{school.telefono}</div>}
+        {/* Mobile cards */}
+        <div className="md:hidden divide-y divide-gray-200">
+          {filteredSchools.length === 0 ? (
+            <p className="text-center text-gray-500 py-10 text-base">No se encontraron escuelas.</p>
+          ) : (
+            filteredSchools.map((school) => (
+              <div key={school.id} className="p-5">
+                <button
+                  type="button"
+                  className="w-full text-left mb-4 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/40 rounded-lg"
+                  onClick={() => selectSchool(school.id)}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <p className="text-lg font-semibold text-gray-900">{school.nombre}</p>
+                      <Badge status="active" className="mt-1">{school.nivel}</Badge>
+                    </div>
+                    <ChevronRight className="w-6 h-6 text-gray-400 mt-1" aria-hidden="true" />
                   </div>
-                </TableCell>
-                <TableCell><Badge status="active">{school.nivel}</Badge></TableCell>
-                <TableCell className="text-center font-medium">{school.totalAlumnos}</TableCell>
-                <TableCell className="text-center font-medium text-green-600">{school.pagados}</TableCell>
-                <TableCell className="text-center font-medium text-red-600">{school.impagos > 0 ? school.impagos : '-'}</TableCell>
-                <TableCell className="text-right font-semibold text-gray-900">{formatCurrency(school.facturado)}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                    <Button variant="ghost" size="sm" className="text-gray-500 hover:text-primary hover:bg-violet-50"
-                      onClick={(e) => { e.stopPropagation(); handleEditSchool(school); }}>
-                      <Pencil className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button variant="ghost" size="sm" className="text-gray-500 hover:text-red-600 hover:bg-red-50"
-                      onClick={(e) => { e.stopPropagation(); handleDeleteSchool(school); }}>
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
+                  <div className="mt-3 space-y-1.5 text-sm text-gray-700">
+                    <p className="flex items-center gap-2"><MapPin className="w-4 h-4 shrink-0" />{school.direccion}</p>
+                    {school.telefono && <p className="flex items-center gap-2"><Phone className="w-4 h-4 shrink-0" />{school.telefono}</p>}
                   </div>
-                </TableCell>
-                <TableCell><ChevronRight className="w-4 h-4 text-gray-400" /></TableCell>
+                </button>
+
+                <dl className="grid grid-cols-3 gap-2 text-center mb-4">
+                  <div className="rounded-lg bg-gray-50 py-2">
+                    <dt className="text-sm font-medium text-gray-600">Alumnos</dt>
+                    <dd className="text-xl font-bold text-gray-900">{school.totalAlumnos}</dd>
+                  </div>
+                  <div className="rounded-lg bg-green-50 py-2">
+                    <dt className="text-sm font-medium text-gray-700">Pagados</dt>
+                    <dd className="text-xl font-bold text-green-700">{school.pagados}</dd>
+                  </div>
+                  <div className="rounded-lg bg-red-50 py-2">
+                    <dt className="text-sm font-medium text-gray-700">Impagos</dt>
+                    <dd className="text-xl font-bold text-red-700">{school.impagos}</dd>
+                  </div>
+                </dl>
+
+                <p className="text-base mb-3">
+                  <span className="text-sm font-medium text-gray-600">Facturado: </span>
+                  <span className="font-bold text-gray-900">{formatCurrency(school.facturado)}</span>
+                </p>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <Button variant="outline" size="md" onClick={() => handleEditSchool(school)}>
+                    <Pencil className="w-5 h-5 mr-1.5" /> Editar
+                  </Button>
+                  <Button variant="outline" size="md" className="text-red-700 border-red-200 hover:bg-red-50 hover:border-red-300" onClick={() => handleDeleteSchool(school)}>
+                    <Trash2 className="w-5 h-5 mr-1.5" /> Eliminar
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden md:block">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[260px]">Establecimiento</TableHead>
+                <TableHead>Contacto</TableHead>
+                <TableHead>Nivel</TableHead>
+                <TableHead className="text-center">Alumnos</TableHead>
+                <TableHead className="text-center">Pagados</TableHead>
+                <TableHead className="text-center">Impagos</TableHead>
+                <TableHead className="text-right">Facturado</TableHead>
+                <TableHead className="text-right">Acciones</TableHead>
+                <TableHead className="w-10"></TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredSchools.map((school) => (
+                <TableRow key={school.id} className="cursor-pointer hover:bg-violet-50/50 transition-colors" onClick={() => selectSchool(school.id)}>
+                  <TableCell>
+                    <p className="font-semibold text-gray-900">{school.nombre}</p>
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-1 text-gray-700 text-sm">
+                      <div className="flex items-center gap-1.5"><MapPin className="w-4 h-4" />{school.direccion}</div>
+                      {school.telefono && <div className="flex items-center gap-1.5"><Phone className="w-4 h-4" />{school.telefono}</div>}
+                    </div>
+                  </TableCell>
+                  <TableCell><Badge status="active">{school.nivel}</Badge></TableCell>
+                  <TableCell className="text-center font-semibold">{school.totalAlumnos}</TableCell>
+                  <TableCell className="text-center font-semibold text-green-700">{school.pagados}</TableCell>
+                  <TableCell className="text-center font-semibold text-red-700">{school.impagos > 0 ? school.impagos : '—'}</TableCell>
+                  <TableCell className="text-right font-semibold text-gray-900">{formatCurrency(school.facturado)}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+                      <Button variant="ghost" size="sm" aria-label="Editar escuela"
+                        onClick={(e) => { e.stopPropagation(); handleEditSchool(school); }}>
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="text-red-700 hover:bg-red-50" aria-label="Eliminar escuela"
+                        onClick={(e) => { e.stopPropagation(); handleDeleteSchool(school); }}>
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                  <TableCell><ChevronRight className="w-5 h-5 text-gray-400" /></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );

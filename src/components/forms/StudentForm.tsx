@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
+import { Select } from '../ui/Select';
 import { useSchoolStore } from '../../store/useSchoolStore';
 import { useStudentStore } from '../../store/useStudentStore';
 import { useModalStore } from '../../store/useModalStore';
@@ -117,95 +118,94 @@ export default function StudentForm({ student }: StudentFormProps) {
     if (globalError) setGlobalError('');
   };
 
+  const labelClass = 'block text-base font-semibold text-gray-800 mb-1.5';
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {globalError && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">{globalError}</div>
+        <div className="bg-red-50 border-2 border-red-200 text-red-800 px-4 py-3 rounded-lg text-base font-medium">{globalError}</div>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">Nombre <span className="text-danger">*</span></label>
+          <label htmlFor="nombre" className={labelClass}>Nombre <span className="text-danger">*</span></label>
           <Input id="nombre" placeholder="Ej: Juan" value={formData.nombre}
             onChange={(e) => { setFormData({ ...formData, nombre: e.target.value }); handleClearError('nombre'); }}
             error={!!errors.nombre} />
-          {errors.nombre && <p className="mt-1 text-sm text-danger">{errors.nombre}</p>}
+          {errors.nombre && <p className="mt-1 text-sm font-medium text-danger">{errors.nombre}</p>}
         </div>
         <div>
-          <label htmlFor="apellido" className="block text-sm font-medium text-gray-700 mb-1">Apellido <span className="text-danger">*</span></label>
+          <label htmlFor="apellido" className={labelClass}>Apellido <span className="text-danger">*</span></label>
           <Input id="apellido" placeholder="Ej: Pérez" value={formData.apellido}
             onChange={(e) => { setFormData({ ...formData, apellido: e.target.value }); handleClearError('apellido'); }}
             error={!!errors.apellido} />
-          {errors.apellido && <p className="mt-1 text-sm text-danger">{errors.apellido}</p>}
+          {errors.apellido && <p className="mt-1 text-sm font-medium text-danger">{errors.apellido}</p>}
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="dni" className="block text-sm font-medium text-gray-700 mb-1">DNI <span className="text-danger">*</span></label>
+          <label htmlFor="dni" className={labelClass}>DNI <span className="text-danger">*</span></label>
           <Input id="dni" placeholder="Ej: 45123456" value={formData.dni}
             onChange={(e) => { setFormData({ ...formData, dni: e.target.value }); handleClearError('dni'); }}
             error={!!errors.dni} />
-          {errors.dni && <p className="mt-1 text-sm text-danger">{errors.dni}</p>}
+          {errors.dni && <p className="mt-1 text-sm font-medium text-danger">{errors.dni}</p>}
         </div>
         <div>
-          <label htmlFor="escuela" className="block text-sm font-medium text-gray-700 mb-1">Escuela <span className="text-danger">*</span></label>
-          <select id="escuela" title="Seleccionar Escuela"
-            className={`flex h-10 w-full rounded-md border ${errors.escuela ? 'border-danger' : 'border-gray-300'} bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary`}
+          <label htmlFor="escuela" className={labelClass}>Escuela <span className="text-danger">*</span></label>
+          <Select id="escuela" error={!!errors.escuela}
             value={formData.escuelaId}
             onChange={(e) => { handleSchoolChange(Number(e.target.value)); handleClearError('escuela'); }}>
             {schools.length === 0 && <option value={0}>No hay escuelas disp.</option>}
             {schools.map((school) => (
               <option key={school.id} value={school.id}>{school.nombre}</option>
             ))}
-          </select>
-          {errors.escuela && <p className="mt-1 text-sm text-danger">{errors.escuela}</p>}
+          </Select>
+          {errors.escuela && <p className="mt-1 text-sm font-medium text-danger">{errors.escuela}</p>}
         </div>
       </div>
 
       <div>
-        <label htmlFor="direccion" className="block text-sm font-medium text-gray-700 mb-1">Dirección <span className="text-danger">*</span></label>
+        <label htmlFor="direccion" className={labelClass}>Dirección <span className="text-danger">*</span></label>
         <Input id="direccion" placeholder="Ej: Av. Mitre 1234" value={formData.direccion}
           onChange={(e) => { setFormData({ ...formData, direccion: e.target.value }); handleClearError('direccion'); }}
           error={!!errors.direccion} />
-        {errors.direccion && <p className="mt-1 text-sm text-danger">{errors.direccion}</p>}
+        {errors.direccion && <p className="mt-1 text-sm font-medium text-danger">{errors.direccion}</p>}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
-          <label htmlFor="nivel" className="block text-sm font-medium text-gray-700 mb-1">Nivel</label>
-          <select id="nivel" title="Nivel"
-            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary"
-            value={formData.nivel}
+          <label htmlFor="nivel" className={labelClass}>Nivel</label>
+          <Select id="nivel" value={formData.nivel}
             onChange={(e) => setFormData({ ...formData, nivel: e.target.value as Nivel })}>
             <option value="Jardín">Jardín</option>
             <option value="Primaria">Primaria</option>
             <option value="Secundaria">Secundaria</option>
             <option value="Escuela Unificada">Escuela Unificada</option>
-          </select>
+          </Select>
         </div>
         <div>
-          <label htmlFor="turno" className="block text-sm font-medium text-gray-700 mb-1">Turno</label>
-          <select id="turno" title="Turno"
-            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary"
-            value={formData.turno}
+          <label htmlFor="turno" className={labelClass}>Turno</label>
+          <Select id="turno" value={formData.turno}
             onChange={(e) => setFormData({ ...formData, turno: e.target.value as Turno })}>
             <option value="Mañana">Mañana</option>
             <option value="Tarde">Tarde</option>
-          </select>
+          </Select>
         </div>
         <div>
-          <label htmlFor="valor" className="block text-sm font-medium text-gray-700 mb-1">Valor Mensual ($) <span className="text-danger">*</span></label>
+          <label htmlFor="valor" className={labelClass}>Valor mensual ($) <span className="text-danger">*</span></label>
           <Input id="valor" type="number" min="1" placeholder="Ej: 25000" value={formData.valor}
             onChange={(e) => { setFormData({ ...formData, valor: e.target.value }); handleClearError('valor'); }}
             error={!!errors.valor} />
-          {errors.valor && <p className="mt-1 text-sm text-danger">{errors.valor}</p>}
+          {errors.valor && <p className="mt-1 text-sm font-medium text-danger">{errors.valor}</p>}
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 pt-6 border-t border-gray-100 mt-6">
-        <Button type="button" variant="outline" onClick={closeModal}>Cancelar</Button>
-        <Button type="submit" disabled={!isFormValid}>{isEditing ? 'Guardar Cambios' : 'Guardar Alumno'}</Button>
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-6 border-t border-gray-200 mt-6">
+        <Button type="button" variant="outline" onClick={closeModal} className="w-full sm:w-auto">Cancelar</Button>
+        <Button type="submit" disabled={!isFormValid} className="w-full sm:w-auto">
+          {isEditing ? 'Guardar cambios' : 'Guardar alumno'}
+        </Button>
       </div>
     </form>
   );

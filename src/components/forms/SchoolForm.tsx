@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
+import { Select } from '../ui/Select';
 import { useSchoolStore } from '../../store/useSchoolStore';
 import { useModalStore } from '../../store/useModalStore';
 import type { Nivel, School } from '../../types';
@@ -32,12 +33,11 @@ export default function SchoolForm({ school }: SchoolFormProps) {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    
-    // Soft validation (redundant check if button was somehow enabled)
+
     const newErrors: typeof errors = {};
     if (!formData.nombre.trim()) newErrors.nombre = 'El nombre es obligatorio';
     if (!formData.direccion.trim()) newErrors.direccion = 'La dirección es obligatoria';
-    
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -66,11 +66,13 @@ export default function SchoolForm({ school }: SchoolFormProps) {
     closeModal();
   };
 
+  const labelClass = 'block text-base font-semibold text-gray-800 mb-1.5';
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
-          Nombre de la Institución <span className="text-danger">*</span>
+        <label htmlFor="nombre" className={labelClass}>
+          Nombre de la institución <span className="text-danger">*</span>
         </label>
         <Input
           id="nombre"
@@ -82,11 +84,11 @@ export default function SchoolForm({ school }: SchoolFormProps) {
           }}
           error={!!errors.nombre}
         />
-        {errors.nombre && <p className="mt-1 text-sm text-danger">{errors.nombre}</p>}
+        {errors.nombre && <p className="mt-1 text-sm font-medium text-danger">{errors.nombre}</p>}
       </div>
 
       <div>
-        <label htmlFor="direccion" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="direccion" className={labelClass}>
           Dirección <span className="text-danger">*</span>
         </label>
         <Input
@@ -99,14 +101,12 @@ export default function SchoolForm({ school }: SchoolFormProps) {
           }}
           error={!!errors.direccion}
         />
-        {errors.direccion && <p className="mt-1 text-sm text-danger">{errors.direccion}</p>}
+        {errors.direccion && <p className="mt-1 text-sm font-medium text-danger">{errors.direccion}</p>}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-1">
-            Teléfono
-          </label>
+          <label htmlFor="telefono" className={labelClass}>Teléfono</label>
           <Input
             id="telefono"
             placeholder="Ej: 4455-6677"
@@ -115,9 +115,7 @@ export default function SchoolForm({ school }: SchoolFormProps) {
           />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email
-          </label>
+          <label htmlFor="email" className={labelClass}>Email</label>
           <Input
             id="email"
             type="email"
@@ -128,46 +126,33 @@ export default function SchoolForm({ school }: SchoolFormProps) {
         </div>
       </div>
 
-      <div>
-        <label htmlFor="nivel" className="block text-sm font-medium text-gray-700 mb-1">
-          Nivel
-        </label>
-        <select
-          id="nivel"
-          title="Nivel"
-          className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          value={formData.nivel}
-          onChange={(e) => setFormData({ ...formData, nivel: e.target.value as Nivel })}
-        >
-          <option value="Jardín">Jardín</option>
-          <option value="Primaria">Primaria</option>
-          <option value="Secundaria">Secundaria</option>
-          <option value="Escuela Unificada">Escuela Unificada</option>
-        </select>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="nivel" className={labelClass}>Nivel</label>
+          <Select id="nivel" value={formData.nivel}
+            onChange={(e) => setFormData({ ...formData, nivel: e.target.value as Nivel })}>
+            <option value="Jardín">Jardín</option>
+            <option value="Primaria">Primaria</option>
+            <option value="Secundaria">Secundaria</option>
+            <option value="Escuela Unificada">Escuela Unificada</option>
+          </Select>
+        </div>
+        <div>
+          <label htmlFor="estado" className={labelClass}>Estado</label>
+          <Select id="estado" value={formData.estado}
+            onChange={(e) => setFormData({ ...formData, estado: e.target.value as 'Activa' | 'Inactiva' })}>
+            <option value="Activa">Activa</option>
+            <option value="Inactiva">Inactiva</option>
+          </Select>
+        </div>
       </div>
 
-      <div>
-        <label htmlFor="estado" className="block text-sm font-medium text-gray-700 mb-1">
-          Estado
-        </label>
-        <select
-          id="estado"
-          title="Estado"
-          className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          value={formData.estado}
-          onChange={(e) => setFormData({ ...formData, estado: e.target.value as 'Activa' | 'Inactiva' })}
-        >
-          <option value="Activa">Activa</option>
-          <option value="Inactiva">Inactiva</option>
-        </select>
-      </div>
-
-      <div className="flex justify-end gap-3 pt-6 border-t border-gray-100 mt-6">
-        <Button type="button" variant="outline" onClick={closeModal}>
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-6 border-t border-gray-200 mt-6">
+        <Button type="button" variant="outline" onClick={closeModal} className="w-full sm:w-auto">
           Cancelar
         </Button>
-        <Button type="submit" disabled={!isFormValid}>
-          {isEditing ? 'Guardar Cambios' : 'Guardar Escuela'}
+        <Button type="submit" disabled={!isFormValid} className="w-full sm:w-auto">
+          {isEditing ? 'Guardar cambios' : 'Guardar escuela'}
         </Button>
       </div>
     </form>

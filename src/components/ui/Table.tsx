@@ -7,7 +7,7 @@ const Table = forwardRef<HTMLTableElement, HTMLAttributes<HTMLTableElement>>(
     <div className="w-full overflow-auto">
       <table
         ref={ref}
-        className={cn('w-full caption-bottom text-sm border-collapse', className)}
+        className={cn('w-full caption-bottom text-base border-collapse', className)}
         {...props}
       />
     </div>
@@ -48,7 +48,7 @@ const TableHead = forwardRef<HTMLTableCellElement, ThHTMLAttributes<HTMLTableCel
     <th
       ref={ref}
       className={cn(
-        'h-12 px-4 text-left align-middle font-medium text-gray-500 [&:has([role=checkbox])]:pr-0',
+        'h-14 px-4 text-left align-middle font-semibold text-gray-700 text-sm uppercase tracking-wide [&:has([role=checkbox])]:pr-0',
         className
       )}
       {...props}
@@ -61,7 +61,7 @@ const TableCell = forwardRef<HTMLTableCellElement, TdHTMLAttributes<HTMLTableCel
   ({ className, ...props }, ref) => (
     <td
       ref={ref}
-      className={cn('p-4 align-middle text-gray-700 [&:has([role=checkbox])]:pr-0', className)}
+      className={cn('px-4 py-4 align-middle text-gray-800 [&:has([role=checkbox])]:pr-0', className)}
       {...props}
     />
   )

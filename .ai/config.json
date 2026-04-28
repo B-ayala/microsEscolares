@@ -1,0 +1,54 @@
+{
+  "project": "MicrosMiguel",
+  "displayName": "MicrosMiguel — Micros Escolares",
+  "type": "saas-internal-tool",
+  "domain": "transporte escolar (gestion de alumnos, escuelas, colectivos, pagos y gastos)",
+  "stack": [
+    "react@19",
+    "typescript@~5.9",
+    "vite@7",
+    "tailwindcss@4 (@tailwindcss/vite)",
+    "zustand@5",
+    "react-router-dom@7 (HashRouter)",
+    "recharts@3",
+    "lucide-react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "architecture": "spa-frontend-only",
+  "persistence": "in-memory (zustand, sin backend)",
+  "auth": "none",
+  "stateManagement": "zustand (un store por dominio + useModalStore global)",
+  "styling": {
+    "primary": "tailwind v4 utilities + tokens en @theme",
+    "components": "componentes propios en src/components/ui (Button, Input, Badge, Card, Table)",
+    "lastResort": "CSS plano colindante (kebab-case, sin CSS Modules)",
+    "designTokens": {
+      "primary": "#7c3aed",
+      "primaryHover": "#8b5cf6",
+      "success": "#16a34a",
+      "warning": "#eab308",
+      "danger": "#dc2626",
+      "font": "Inter, system-ui, sans-serif",
+      "radius": { "sm": "8px", "md": "12px" }
+    }
+  },
+  "uxPatterns": {
+    "forms": "siempre dentro de modal global (useModalStore.openModal)",
+    "confirmations": "modal con Cancelar / Acción destructiva en rojo",
+    "lists": "tabla con KPIs arriba, filtros barra superior, hover gray-50/50",
+    "navigation": "sidebar fijo desktop, drawer mobile con backdrop"
+  },
+  "deployment": {
+    "target": "github-pages",
+    "branch": "gh-pages",
+    "basePath": "/microsEscolares/",
+    "spaFallback": "dist/index.html copiado a dist/404.html",
+    "scripts": {
+      "build": "tsc -b && vite build",
+      "deploy": "cp dist/index.html dist/404.html && gh-pages -d dist"
+    }
+  },
+  "ports": { "dev": 5173 },
+  "locale": { "language": "es-AR", "currency": "ARS" }
+}
